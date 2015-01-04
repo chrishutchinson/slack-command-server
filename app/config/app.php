@@ -4,6 +4,9 @@ return array(
 
 	'slack' => array(
 		'token' => $_ENV['slack.token'],
+		'slackbot' => array(
+			'token' => $_ENV['slack.slackbot.token'],
+		),
 	),
 
 	'wordnik' => array(

@@ -6,7 +6,8 @@
 	"type": "project",
 	"require": {
 		"laravel/framework": "4.2.*",
-		"alanly/picnik": "dev-master"
+		"alanly/picnik": "dev-master",
+		"guzzlehttp/guzzle": "4.2.3"
 	},
 	"autoload": {
 		"classmap": [
