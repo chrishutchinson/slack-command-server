@@ -3,6 +3,7 @@
 return array(
 
 	'slack' => array(
+		'team' => $_ENV['slack.team'],
 		'token' => $_ENV['slack.token'],
 		'slackbot' => array(
 			'token' => $_ENV['slack.slackbot.token'],

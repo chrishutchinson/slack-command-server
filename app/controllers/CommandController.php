@@ -94,7 +94,7 @@ class CommandController extends \BaseController {
 
 *Example:* ' . $data['list'][0]['example'];
 
-			$client->post('https://times.slack.com/services/hooks/slackbot?token=' . Config::get('app.slack.slackbot.token') . '&channel=' . $channel, ['body' => $message]);
+			$client->post('https://' . Config::get('app.slack.team') . '.slack.com/services/hooks/slackbot?token=' . Config::get('app.slack.slackbot.token') . '&channel=' . $channel, ['body' => $message]);
 		} catch(Exception $e) {
 			return 'Error: ' . $e->getMessage();
 		}
