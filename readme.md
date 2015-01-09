@@ -12,3 +12,6 @@ Returns a definition for the supplied word, using the [Wordnik API](http://devel
 
 Returns the Urban Dictionary definition for the supplied word, using the [Urban Dictinary API](http://api.urbandictionary.com/).
 
+#### `/phonetic [word]`
+
+Returns the phonetic definition for the supplied word.

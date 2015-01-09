@@ -16,7 +16,8 @@ class CommandController extends \BaseController {
 			$input = Input::all();
 
 			// Check if the request is from an expected token
-			if(in_array($input['token'], array(Config::get('app.slack.token')))) {
+			$tokens = explode('|', Config::get('app.slack.token'));
+			if(in_array($input['token'], $tokens)) {
 				// This is a verified request
 
 				// If a command is set
@@ -28,6 +29,8 @@ class CommandController extends \BaseController {
 						case '/urban': // Urban Dictionary Definition
 							return $this->urbanCommand($input['text'], $input['channel_id']);
 							break;
+						case '/phonetic': // Phonetic
+							return $this->phoneticCommand($input['text'], $input['channel_id']);
 						default:
 							return false;
 							break;
@@ -94,6 +97,71 @@ class CommandController extends \BaseController {
 
 *Example:* ' . $data['list'][0]['example'];
 
+			$client->post('https://' . Config::get('app.slack.team') . '.slack.com/services/hooks/slackbot?token=' . Config::get('app.slack.slackbot.token') . '&channel=' . $channel, ['body' => $message]);
+		} catch(Exception $e) {
+			return 'Error: ' . $e->getMessage();
+		}
+	}
+
+	/**
+	 * Return the phonetic translation of the supplied word
+	 *
+	 * @param 	string 	$word
+	 * @return 	string 	$definition
+	 */
+	private function phoneticCommand($word, $channel)
+	{
+		try {
+			$phoneticAlphabet = array(
+				'a' => 'alpha', 
+				'b' => 'bravo', 
+				'c' => 'charlie', 
+				'd' => 'delta', 
+				'e' => 'echo', 
+				'f' => 'foxtrot', 
+				'g' => 'golf', 
+				'h' => 'hotel', 
+				'i' => 'india', 
+				'j' => 'juliet', 
+				'k' => 'kilo', 
+				'l' => 'lima', 
+				'm' => 'mike', 
+				'n' => 'november', 
+				'o' => 'oscar', 
+				'p' => 'papa', 
+				'q' => 'quebec', 
+				'r' => 'romeo', 
+				's' => 'sierra', 
+				't' => 'tango', 
+				'u' => 'uniform', 
+				'v' => 'victor', 
+				'w' => 'whisky', 
+				'x' => 'x-ray', 
+				'y' => 'yankee', 
+				'z' => 'zulu',
+			);
+
+			$letters = str_split($word);
+			$return = '';
+
+			foreach($letters as $key => $letter) {
+				$letter = strtolower($letter);
+				switch($letter) {
+					case ' ':
+						$return .= ' ';
+						break;
+					default:
+						if(isset($phoneticAlphabet[$letter])) {
+							// We found the letter
+							$return .= $phoneticAlphabet[$letter] . ' ';
+						}
+						break;
+				}
+			}
+
+			$message =  'The Phonetic Translation of "' . $word . '" is *' . trim($return) . '*';
+			
+			$client = new GuzzleHttp\Client();
 			$client->post('https://' . Config::get('app.slack.team') . '.slack.com/services/hooks/slackbot?token=' . Config::get('app.slack.slackbot.token') . '&channel=' . $channel, ['body' => $message]);
 		} catch(Exception $e) {
 			return 'Error: ' . $e->getMessage();
