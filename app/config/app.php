@@ -13,6 +13,11 @@ return array(
 	'wordnik' => array(
 		'key' => $_ENV['wordnik.key'],
 	),
+
+	'canteen' => array(
+		'menu' => $_ENV['canteen.menu'],
+		'webhook' => $_ENV['canteen.webhook'],
+	),
  
 	/*
 	|--------------------------------------------------------------------------
@@ -25,7 +30,7 @@ return array(
 	|
 	*/
 
-	'debug' => false,
+	'debug' => true,
 
 	/*
 	|--------------------------------------------------------------------------

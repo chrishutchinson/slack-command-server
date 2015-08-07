@@ -24,11 +24,13 @@ $app = new Illuminate\Foundation\Application;
 |
 */
 
-$env = $app->detectEnvironment(array(
+$env = $app->detectEnvironment(function () {
+	// Look for APP_ENV in the server config
+	if(isset($_ENV['APP_ENV'])) return $_ENV['APP_ENV'];
 
-	'local' => array('Chriss-MacBook-Pro.local'),
-
-));
+	// Look for /bootstrap/environment.php
+	if(file_exists(__DIR__ . '/environment.php')) return include __DIR__ . '/environment.php';
+});
 
 /*
 |--------------------------------------------------------------------------

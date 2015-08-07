@@ -31,6 +31,8 @@ class CommandController extends \BaseController {
 							break;
 						case '/phonetic': // Phonetic
 							return $this->phoneticCommand($input['text'], $input['channel_id']);
+						case '/canteen': // Canteen
+							return $this->canteenCommand($input['text']);
 						default:
 							return false;
 							break;
@@ -66,6 +68,96 @@ class CommandController extends \BaseController {
 	        print_r($definitions);
 
 			return $word;
+		} catch(Exception $e) {
+			return 'Error: ' . $e->getMessage();
+		}
+	}
+
+	/**
+	 * Use the Canteen thing to say what is for lunch
+	 *
+	 * @param 	string 	$word
+	 * @return 	string 	$definition
+	 */
+	private function canteenCommand($day = '')
+	{
+		try {
+			$client = new GuzzleHttp\Client();
+			switch($day) {
+				case 'monday':
+				case 'mondy':
+				case 'mnday':
+					$response = $client->get(Config::get('app.canteen.menu') . 'monday.json');
+					$dayTitle = 'Monday\'s Menu';
+					break;
+				case 'tuesday':
+					$response = $client->get(Config::get('app.canteen.menu') . 'tuesday.json');
+					$dayTitle = 'Tuesday\'s Menu';
+					break;
+				case 'wednesday':
+					$response = $client->get(Config::get('app.canteen.menu') . 'wednesday.json');
+					$dayTitle = 'Wednesday\'s Menu';
+					break;
+				case 'thursday':
+				case 'thrusday':
+					$response = $client->get(Config::get('app.canteen.menu') . 'thursday.json');
+					$dayTitle = 'Thursday\'s Menu';
+					break;
+				case 'friday':
+					$response = $client->get(Config::get('app.canteen.menu') . 'friday.json');
+					$dayTitle = 'Friday\'s Menu';
+					break;
+				case 'saturday':
+					$response = $client->get(Config::get('app.canteen.menu') . 'saturday.json');
+					$dayTitle = 'Saturday\'s Menu';
+					break;
+				case 'sunday':
+					$response = $client->get(Config::get('app.canteen.menu') . 'sunday.json');
+					$dayTitle = 'Sunday\'s Menu';
+					break;
+				case 'today':
+				default:
+					$response = $client->get(Config::get('app.canteen.menu') . 'today.json');
+					$dayTitle = 'Today\'s Menu';
+					break;
+			}
+
+			if(!$response) {
+				return 'There was no response from the canteen, sorry.';
+			}
+
+			$data = $response->json();
+
+			$menuText = '';
+
+			foreach($data['locations'] as $key => $location) {
+				$menuText .= '<' . $location['location']['url'] . '|' . $location['location']['name'] . '>:' . PHP_EOL;
+           		$menuText .= $location['menu'] . PHP_EOL;
+			}
+
+			$url = Config::get('app.canteen.webhook');
+
+			$requestData = array(
+				'username' => 'Canteen Bot',
+				'icon_emoji' => ':fork_and_knife:',
+				'attachments' => array(
+					array(
+			            'fallback' => $dayTitle,
+			            'color' => 'good',
+			            'fields' => array(
+			            	array(
+			                    'title' => $dayTitle,
+			                    'value' => $menuText,
+			                    'short' => false
+			                )
+			            )
+			        )
+		        )
+			);
+
+			$responseData = $client->post($url, array('body' => json_encode($requestData)));
+
+			//$client->post('https://' . Config::get('app.slack.team') . '.slack.com/services/hooks/slackbot?token=' . Config::get('app.slack.slackbot.token') . '&channel=' . $channel, ['body' => $message]);
 		} catch(Exception $e) {
 			return 'Error: ' . $e->getMessage();
 		}
